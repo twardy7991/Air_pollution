@@ -1,3 +1,7 @@
+database/
+airflow_project/logs
+
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]

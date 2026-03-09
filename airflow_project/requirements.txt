@@ -1,0 +1,7 @@
+pandas
+#pyarrow
+#pyspark == 3.5.8
+sqlalchemy
+psycopg[binary]
+psycopg2-binary
+#apache-airflow-providers-apache-spark
