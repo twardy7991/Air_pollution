@@ -51,7 +51,7 @@ x-airflow-common: &airflow-common
   environment: &airflow-common-env
     AIRFLOW__CORE__EXECUTOR: LocalExecutor
     AIRFLOW__CORE__AUTH_MANAGER: airflow.providers.fab.auth_manager.fab_auth_manager.FabAuthManager
-    AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres/airflow
+    AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres_pollution/airflow
     # AIRFLOW__CELERY__RESULT_BACKEND: db+postgresql://airflow:airflow@postgres/airflow
     # AIRFLOW__CELERY__BROKER_URL: redis://:@redis:6379/0
     AIRFLOW__CORE__FERNET_KEY: ''
@@ -76,7 +76,7 @@ x-airflow-common: &airflow-common
     - ${AIRFLOW_PROJ_DIR:-.}/plugins:/opt/airflow/plugins
     ## added folder for data
     - ${AIRFLOW_PROJ_DIR:-.}/../data:/opt/airflow/data
-    - ${AIRFLOW_PROJ_DIR:-.}/../data:/opt/airflow/model
+    - ${AIRFLOW_PROJ_DIR:-.}/model:/opt/airflow/model
     # - ${AIRFLOW_PROJ_DIR:-.}/../cache:/opt/airflow/cache
 
   user: "${AIRFLOW_UID:-50000}:0"
@@ -85,20 +85,20 @@ x-airflow-common: &airflow-common
     &airflow-common-depends-on
     # redis:
     #   condition: service_healthy
-    postgres:
+    postgres_pollution:
       condition: service_healthy
   networks:
-    - default
+    - default_pollution
 
 services:
-  postgres:
+  postgres_pollution:
     image: postgres:16
     environment:
       POSTGRES_USER: airflow
       POSTGRES_PASSWORD: airflow
       POSTGRES_DB: airflow
     volumes:
-      - postgres-db-volume:/var/lib/postgresql/data
+      - pollution-postgres-db-volume:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD", "pg_isready", "-U", "airflow"]
       interval: 10s
@@ -106,7 +106,7 @@ services:
       start_period: 5s
     restart: always
     networks:
-     - default
+     - default_pollution
   # redis:
   #   # Redis is limited to 7.2-bookworm due to licencing change
   #   # https://redis.io/blog/redis-adopts-dual-source-available-licensing/
@@ -154,8 +154,8 @@ services:
       airflow-init:
         condition: service_completed_successfully
     networks:
-    #  - database_network
-     - default
+     - db_pollution_network
+     - default_pollution
     #  - spark-net
 
   airflow-dag-processor:
@@ -173,7 +173,7 @@ services:
       airflow-init:
         condition: service_completed_successfully
     networks:
-      - default
+      - default_pollution
   # airflow-worker:
   #   <<: *airflow-common
   #   command: celery worker
@@ -215,7 +215,8 @@ services:
         condition: service_completed_successfully
     networks:
       # - spark-net
-      - default
+      - default_pollution
+      
 
   airflow-init:
     <<: *airflow-common
@@ -347,11 +348,11 @@ services:
         condition: service_completed_successfully
 
 volumes:
-  postgres-db-volume:
+  pollution-postgres-db-volume:
 
 networks:
-  default:
-  # database_network:
-  #   external: true
+  default_pollution:
+  db_pollution_network:
+    external: true
   # spark-net:
   #   external: true 

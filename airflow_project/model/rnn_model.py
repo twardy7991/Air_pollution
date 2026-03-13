@@ -158,7 +158,7 @@ def gradient_importance(seq, model, abs : bool = False):
 
     return grads
 
-def plot_difference_distributions(y_pred_unscaled, y_actual_unscaled, date=date):
+def plot_difference_distributions(y_pred_unscaled, y_actual_unscaled, date):
     df_pred = pd.DataFrame(np.concatenate((y_pred_unscaled, y_actual_unscaled), axis=1), columns=["pred", "actual"])
     df_pred["diff"] = df_pred["actual"] - df_pred["pred"]
 

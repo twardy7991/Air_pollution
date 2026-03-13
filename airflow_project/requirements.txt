@@ -1,7 +1,9 @@
 pandas
 #pyarrow
 #pyspark == 3.5.8
+torch
 sqlalchemy
 psycopg[binary]
 psycopg2-binary
+matplotlib
 #apache-airflow-providers-apache-spark
