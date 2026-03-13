@@ -2,9 +2,9 @@ from airflow import DAG
 import airflow
 from datetime import datetime
 from airflow.operators.python import PythonOperator
-from dags.download_weather_data import _download_weather_data
-from dags.download_pollution_data import _download_pollution_data
-from dags.recompute_predictions import _recompute_predictions
+from download_weather_data import _download_weather_data
+from download_pollution_data import _download_pollution_data
+from recompute_predictions import _recompute_model_predictions
 
 update_model_dag = DAG(
     dag_id="download_model",
@@ -26,7 +26,7 @@ download_pollution_data = PythonOperator(
 
 recompute_predictions = PythonOperator(
     task_id="recompute_predictions",
-    python_callable=_recompute_predictions,
+    python_callable=_recompute_model_predictions,
     dag=update_model_dag
 )
 

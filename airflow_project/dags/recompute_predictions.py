@@ -1,44 +1,95 @@
+import sys
+
+sys.path.append("/opt/airflow/model/")
+
 import torch
 import pandas as pd
 from datetime import datetime
-from projects.Air_pollution.airflow_project.model.rnn_model import RNNModel
-from plugins.my_postgres_hook import MyPostgresHook
+from my_postgres_hook import MyPostgresHook
+from rnn_model import RNNModel
 
-def _recompute_predictions(timestamp_to_predict):
-    
-    torch.load()
-    return
+import numpy as np
 
 def _recompute_model_predictions(timestamp_to_predict, model_name : str, conn_id : str):
     
     timestamp_to_predict : datetime
     
-    time_series_start = timestamp_to_predict - datetime.hour(24)
-    time_series_end = timestamp_to_predict - datetime.hour(1)
+    time_series_start = timestamp_to_predict - datetime.hour(23)
+    time_series_end = timestamp_to_predict 
     
-    data = _get_data(conn_id=conn_id, 
+    weather_df = _get_weather_data(conn_id=conn_id, 
                     time_series_start=time_series_start, 
                     time_series_end=time_series_end)
     
+    time_series_start = timestamp_to_predict - datetime.hour(24)
+    time_series_end = timestamp_to_predict - datetime.hour(1)
+    
+    pollution_df = _get_pollution_data(conn_id=conn_id, 
+                    time_series_start=time_series_start, 
+                    time_series_end=time_series_end
+                    )
+    
+    df = np.concatenate(weather_df, pollution_df, axis=1)
+    
     model : RNNModel = torch.load(model_name)
     
-    predictions = model(data)
+    predictions = model(df)
     
-    return
+    _save_predictions(predictions)
+    
+    return 
 
-def _get_data(conn_id : str, time_series_start, time_series_end):
+def _get_weather_data(conn_id : str, time_series_start, time_series_end):
+    return _get_data(conn_id, time_series_start, time_series_end, table="weather")
+
+def _get_pollution_data(conn_id : str, time_series_start, time_series_end):
+    return _get_data(conn_id, time_series_start, time_series_end, table="pollution")
+
+def _get_data(conn_id : str, time_series_start, time_series_end, table):
     
     with MyPostgresHook(conn_id=conn_id).get_conn() as conn:
         
-        pd.read_sql(
+        df : pd.DataFrame = pd.read_sql(
             sql=f"""SELECT * 
-                    FROM weather
+                    FROM {table}
                     WHERE timestamp >= {time_series_start}
                     AND timestamp < {time_series_end}
                     ORDER BY timestamp""",
             con=conn)
+    
+    if table=="pollution":
+        return df[["pm2_5"]]
+    else:
+        return df[
+                    ['temperature_2m', 
+                    'relative_humidity_2m', 
+                    'dew_point_2m',
+                    'apparent_temperature', 
+                    'surface_pressure', 
+                    'wind_speed_10m',
+                    'wind_speed_80m', 
+                    'wind_speed_120m', 
+                    'wind_speed_180m',
+                    'wind_direction_10m',
+                    'wind_direction_80m', 
+                    'wind_direction_120m',
+                    'wind_direction_180m',
+                    'wind_gusts_10m', 
+                    'shortwave_radiation',
+                    'direct_radiation', 
+                    'diffuse_radiation', 
+                    'vapour_pressure_deficit',
+                    'precipitation', 
+                    'snowfall', 
+                    'freezing_level_height']
+                ]
         
 def _save_predictions(data : pd.DataFrame, conn_id):
+    
+        
+    #df["run"] = f"run_{str(datetime.now().date())}_{(datetime.now().time())}"
+    
+    #df.set_index("run", inplace=True)
     
     with MyPostgresHook(conn_id=conn_id).get_conn() as conn:
         
@@ -47,4 +98,6 @@ def _save_predictions(data : pd.DataFrame, conn_id):
             con=conn,
             if_exists="replace"
         )
+        
+    return 0
     
