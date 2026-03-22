@@ -2,24 +2,12 @@ import pandas as pd
 from my_postgres_hook import MyPostgresHook
 from pandas.testing import assert_frame_equal
 from contextlib import contextmanager
-from download_pollution_data import _save_to_database, _download_pollution_data
+from download_data import _save_to_database, _download_data
 from datetime import datetime
 import json
 
-import pytest_mock
-from sqlalchemy import create_engine, text
+
 import pytest
-
-engine = create_engine("postgresql+psycopg2://postgres:postgres@localhost:5442/test_pollution_db")
-
-@pytest.fixture
-def conn():
-    conn = engine.connect()
-    transaction = conn.begin()
-    yield conn
-    transaction.rollback()
-    conn.rollback()
-    conn.close()
 
 def test_save_to_database(monkeypatch, conn):
     
@@ -80,9 +68,9 @@ def test_download_pollution_data(monkeypatch, mocker, conn):
     #monkeypatch.setattr("datetime.date", str(datetime(year=2023, month=1, day=3)))
     #monkeypatch.setattr("datetime.time", "00:00")
     
-    save_to_database_patched = mocker.patch("download_pollution_data._save_to_database")
+    save_to_database_patched = mocker.patch("download_data._save_to_database")
     
-    _download_pollution_data(data_type="pollution", 
+    _download_data(data_type="pollution", 
                              current_date=datetime(year=2023, month=1, day=3), 
                              conn_id="")
     
@@ -110,7 +98,7 @@ def test_download_pollution_data(monkeypatch, mocker, conn):
     #     ORDER BY time ASC""",
     #     con=conn)
 
-from download_pollution_data import ForecastNotAvailable
+from download_data import ForecastNotAvailable
 
 def test_download_data_wrong_status_code(monkeypatch):
     
@@ -122,7 +110,7 @@ def test_download_data_wrong_status_code(monkeypatch):
         monkeypatch.setenv("LAST_DATE_STORED_POLLUTION", str(datetime(year=2023, month=1, day=1)))
         monkeypatch.setattr("requests.get", lambda *args, **kwargs: MockResponse)
 
-        _download_pollution_data(data_type="pollution", 
+        _download_data(data_type="pollution", 
                                 current_date=datetime(year=2023, month=1, day=3))
     
     

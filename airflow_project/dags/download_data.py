@@ -12,7 +12,7 @@ class ForecastNotAvailable(BaseException):
 from constants import _get_params, BASE_URL_FORECAST, BASE_URL_POLLUTION
 from typing import Literal
 
-def _download_pollution_data(data_type : Literal["pollution", "weather"], current_date : datetime, lat : int = 50.05, lon : int = 19.92, conn_id : str = "POSTGRES_CONN_POLLUTION"):
+def _download_data(data_type : Literal["pollution", "weather"], current_date : datetime, lat : int = 50.05, lon : int = 19.92, conn_id : str = "POSTGRES_CONN_POLLUTION"):
 
     if data_type == "pollution":
         url = BASE_URL_POLLUTION
