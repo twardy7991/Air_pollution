@@ -1,0 +1,26 @@
+
+
+services:
+  dashboard_pollution:
+    build: .
+    container_name: dashboard_pollution
+    env_file: ".env"
+
+    ports:
+     - 8501:8501
+
+    volumes:
+      - .:/app
+    environment:
+      - STREAMLIT_SERVER_RUN_ON_SAVE=true
+      - STREAMLIT_SERVER_FILE_WATCHER_TYPE=auto
+    networks:
+     - dashboard_pollution_network
+  
+
+networks:
+  dashboard_pollution_network:
+    external: true
+    
+    
+
