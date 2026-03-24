@@ -64,4 +64,4 @@ def _get_params(data_type : str, lon : int, lat : int, days : int):
         }   
 
 BASE_URL_POLLUTION = "https://air-quality-api.open-meteo.com/v1/air-quality"
-BASE_URL_FORECAST = url = "https://api.open-meteo.com/v1/forecast"
+BASE_URL_FORECAST = "https://api.open-meteo.com/v1/forecast"

@@ -4,6 +4,7 @@ services:
     container_name: pollution_db
     volumes:
      - ./initdb:/docker-entrypoint-initdb.d:ro
+     - ./custom_config/postgresql.conf:/etc/postgresql.conf
     # - ./postgresql:/var/lib/postgresql/data
     environment:
      POSTGRES_PASSWORD: postgres
@@ -11,9 +12,16 @@ services:
      POSTGRES_DB: pollution_db
     networks:
      - db_pollution_network
+     - dashboard_pollution_network
+
+    command: >
+      postgres
+      -c config_file=/etc/postgresql.conf
 
 networks:
   db_pollution_network:
+    external: true
+  dashboard_pollution_network:
     external: true
     
      
