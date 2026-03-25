@@ -10,7 +10,7 @@ from rnn_model import RNNModel
 
 import numpy as np
 
-def _recompute_model_predictions(timestamp_to_predict : datetime, model_name : str, conn_id : str):
+def _recompute_model_predictions(timestamp_to_predict : datetime, model_name : str, conn_id : str = "POSTGRES_CONN_POLLUTION"):
     
     time_series_start = timestamp_to_predict - timedelta(hours=4)
     time_series_end = timestamp_to_predict 
@@ -29,7 +29,7 @@ def _recompute_model_predictions(timestamp_to_predict : datetime, model_name : s
     
     df : pd.DataFrame = np.concatenate([weather_df, pollution_df], axis=1)
     
-    model : RNNModel = torch.load(model_name)
+    model : RNNModel = torch.load(f"model/models/{model_name}")
     
     predictions = model(df)
     
