@@ -38,7 +38,6 @@ def _download_data(data_type : Literal["pollution", "weather"], current_date : d
     match data_type:
         case "pollution":
             df_predictions = df[df["time"] > current_date]
-            
             _save_to_database(data_type="pollution" ,data=df_historic, conn_id=conn_id)
             _save_to_database(data_type="official_predictions" ,data=df_predictions, conn_id=conn_id)
         case "weather":
