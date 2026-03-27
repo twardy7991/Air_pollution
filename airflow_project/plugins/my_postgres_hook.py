@@ -21,7 +21,7 @@ class MyPostgresHook(BaseHook):
     def _get_engine(self) -> Engine:
         conn: Connection = self.get_connection(self.conn_id)
         return sqlalchemy.create_engine(
-            conn.get_uri()
+            "postgresql+psycopg://postgres:postgres@pollution_db:5432/pollution_db"#conn.get_uri()
         )
 
     @property

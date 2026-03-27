@@ -1,6 +1,6 @@
 def _get_params(data_type : str, lon : int, lat : int, days : int):
     
-    if type == "weather":
+    if data_type == "weather":
         return {
             "latitude" : lat,
             "longitude" : lon,
