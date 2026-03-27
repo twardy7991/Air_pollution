@@ -45,7 +45,7 @@ recompute_predictions = PythonOperator(
     python_callable=_recompute_model_predictions,
     op_kwargs={
         "timestamp_to_predict" :  datetime.now(),
-        "model_name" : "model_1.pt",
+        "model_name" : "model1.pt",
         "conn_id" : "POSTGRES_CONN_POLLUTION"
     },
     dag=update_model_dag
