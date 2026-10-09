@@ -1,0 +1,20 @@
+
+services:
+  caddy:
+    build: .
+    ports: 
+      - "3500:3500"
+      - "3501:3501"
+    networks:
+      - db_pollution_network
+      - dashboard_pollution_network
+      - airflow_apiserver_network
+
+networks:
+  db_pollution_network:
+    external: true
+  dashboard_pollution_network:
+    external: true
+  airflow_apiserver_network:
+    external: true
+    

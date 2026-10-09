@@ -1,0 +1,7 @@
+:3500 {
+    reverse_proxy  dashboard_pollution:8501
+}
+
+:3501 {
+    reverse_proxy airflow_project_pollution-airflow-apiserver-1:8080
+}
