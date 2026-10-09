@@ -1,15 +1,11 @@
 from airflow import DAG
-import airflow
 from datetime import datetime
 from airflow.providers.standard.operators.python import PythonOperator
 from download_data import _download_data
 from recompute_predictions import _recompute_model_predictions
 
 update_model_dag = DAG(
-    dag_id="update_model",
-    #start_date=datetime(year=2026, month=3, day=26, hour=1),
-    #catchup=False
-    # schedule_interval=
+    dag_id="update_model"
 )
 
 download_weather_data = PythonOperator(

@@ -1,0 +1,17 @@
+{
+	"folders": [
+		{
+			"path": "../../../../../.."
+		},
+		{
+			"path": "../../../.."
+		}
+	],
+	"settings": {
+		"files.associations": {
+			"condition_variable": "c",
+			"future": "c",
+			"fstream": "c"
+		}
+	}
+}

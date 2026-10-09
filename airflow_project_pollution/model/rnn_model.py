@@ -12,6 +12,11 @@ from scipy.stats import norm
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import mean_squared_error
 
+import logging
+
+logger = logging.getLogger(__name__)
+logger.setLevel("INFO")
+
 class WrongModelDataException(BaseException):
     def __init__(self, message,*args):
         super().__init__(message, *args)
@@ -37,8 +42,8 @@ class RNNModel(nn.Module):
         
         return output
 
-def train_model(X : np.ndarray, Y : np.ndarray, model : nn.Module, lr, epochs, step_size, scheduler_gamma, l1, columns, batch_size : int = 32):
-
+def _train_model(X : np.ndarray, Y : np.ndarray, model : nn.Module, lr, epochs, step_size, scheduler_gamma, l1, columns, batch_size : int = 32):
+    
     date = datetime.now()
     
     if not isinstance(X, np.ndarray): 
@@ -54,7 +59,12 @@ def train_model(X : np.ndarray, Y : np.ndarray, model : nn.Module, lr, epochs, s
     x_scaled = scaler_X.fit_transform(X)
     y_scaled = scaler_Y.fit_transform(Y)
     
+    x_scaled = x_scaled.to(torch.float32)
+    y_scaled = y_scaled.to(torch.float32)
+    
     X_train, X_test, y_train, y_test = train_test_split(x_scaled, y_scaled, test_size=0.3, random_state=10)
+    
+    logger.info(type(X_test))
     
     batches = []
     losses = []
@@ -179,3 +189,29 @@ def plot_difference_distributions(y_pred_unscaled, y_actual_unscaled, date):
     plt.plot(x, y)
     
     plt.savefig(f"model/training/difference_distributions_{date}.png")
+
+def train_model(kwargs):
+    pass
+
+def load_data(path):
+    pass
+
+if __name__ == "__main__":
+    import argparse
+    
+    parser = argparse.ArgumentParser()    
+    parser.add_argument("--X_path", default="")
+    parser.add_argument("--Y_path", default="")
+    parser.add_argument("--model_path", default=None)
+    parser.add_argument("--lr", default=0.001)
+    parser.add_argument("--epochs", default=750)
+    parser.add_argument("--scheduler_step_size", default=250)
+    parser.add_argument("--scheduler_gamma", default="0.1")
+    parser.add_argument("--l1", default=None)
+    parser.add_argument("--columns", default=None)
+    parser.add_argument("--batch_size", default=32)
+    
+    args = parser.parse_args()
+    
+    train_model()
+    parser.add_argument

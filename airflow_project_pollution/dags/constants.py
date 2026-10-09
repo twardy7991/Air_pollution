@@ -4,7 +4,7 @@ def _get_params(data_type : str, lon : int, lat : int, days : int):
         return {
             "latitude" : lat,
             "longitude" : lon,
-            "forecast_days" : 1, 
+            "forecast_days" : 2, 
             "past_days" : days,
             "hourly": ["temperature_2m", 
                     "relative_humidity_2m",

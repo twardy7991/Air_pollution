@@ -4,12 +4,13 @@ import logging
 
 from airflow.sdk.bases.hook import BaseHook
 from airflow.models import Connection
+from airflow.sdk import Connection
 import sqlalchemy 
 from sqlalchemy.engine import Transaction
 from sqlalchemy.engine import Engine
 
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
+logger.setLevel(logging.INFO)
 
 class MyPostgresHook(BaseHook):
     
@@ -21,7 +22,7 @@ class MyPostgresHook(BaseHook):
     def _get_engine(self) -> Engine:
         conn: Connection = self.get_connection(self.conn_id)
         return sqlalchemy.create_engine(
-            "postgresql+psycopg://postgres:postgres@pollution_db:5432/pollution_db"#conn.get_uri()
+            "postgresql+psycopg2://postgres:postgres@pollution_db:5472/pollution_db"#conn.get_uri()
         )
 
     @property
@@ -57,5 +58,7 @@ class MyPostgresHook(BaseHook):
             except Exception:    
                 logger.error("Database errror, could not rollback")
                 raise 
+            logger.error("Rollback completed succesfully")
+            raise 
         finally:
             conn.close()

@@ -47,7 +47,7 @@
 x-airflow-common: &airflow-common
   build: .
   env_file:
-    - ${ENV_FILE_PATH:-.env}
+    - ${AIRFLOW_PROJ_DIR:-.}env
   environment: &airflow-common-env
     AIRFLOW__CORE__EXECUTOR: LocalExecutor
     AIRFLOW__CORE__AUTH_MANAGER: airflow.providers.fab.auth_manager.fab_auth_manager.FabAuthManager

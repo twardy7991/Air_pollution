@@ -48,7 +48,7 @@ def test_get_pollution_data(monkeypatch, conn):
         [datetime(year=2023, month=1, day=1), 10, 1],
         [datetime(year=2023, month=1, day=2), 20, 2],
         [datetime(year=2023, month=1, day=3), 30, 3],
-    ], columns=["time", "pm2_5", "pm_10"])
+    ], columns=["time", "pm2_5", "pm10"])
     
     data_in_db.to_sql(name="pollution", con=conn, if_exists="append", index=False)
     
@@ -61,9 +61,9 @@ def test_get_pollution_data(monkeypatch, conn):
                                            table="pollution")
     
     expected_data = pd.DataFrame(data=[
-        [10],
-        [20],
-    ], columns=["pm2_5"])
+        [1, 10],
+        [2, 20],
+    ], columns=["pm10", "pm2_5"])
     
     assert_frame_equal(expected_data, readed_data)
     
@@ -82,7 +82,7 @@ def test_recompute_model_predictions(conn, monkeypatch, mocker : mock):
             return predictions
         return foo    
     
-    monkeypatch.setattr("torch.load", patched_torch_load)
+    monkeypatch.setattr("model.load_state_dict", patched_torch_load)
     
     save_prediction_patched : MagicMock = mocker.patch("recompute_predictions._save_predictions")
     
@@ -118,7 +118,64 @@ def test_recompute_model_predictions(conn, monkeypatch, mocker : mock):
     
     saved_predictions = save_prediction_patched.call_args.args[0]
     
-    assert_frame_equal(expected_saved_predictions_df, saved_predictions)
+    assert_frame_equal(expected_saved_predictions_df, saved_predictions, mocker)
+
+from recompute_predictions import _predict
+import torch
+import pytest
+
+def test_predict():
     
+    class MockedModel:
+        def __init__(self):
+            self.state = 0
+            self.called_dfs = []
+
+        def __call__(self, df):
+            self.called_dfs.append(df)
+            self.state += 1
+
+            return torch.tensor([self.state])
     
+    model_mock = MockedModel()
     
+    df = torch.tensor([
+        [0, 1, 2],
+        [1, 2, 3],
+        [2, 3, 4]
+    ])
+    
+    weather_predictions = torch.tensor([
+        [3,4],
+        [4,5],
+    ])
+    
+    expected_data_frames = [
+        [
+            [0, 1, 2],
+            [1, 2, 3],
+            [2, 3, 4]
+        ],
+        [
+            [1, 2, 3],
+            [2, 3, 4],
+            [3, 4, 1]
+        ],
+        [    
+            [2, 3, 4],
+            [3, 4, 1],
+            [4, 5, 2]
+        ]
+    ]
+    
+    expected_prediction = pd.DataFrame([[1.0],[2.0],[3.0]], columns=["predictions"])
+    
+    predictions = _predict(prediction_len=3, model=model_mock, df=df, weather_predictions=weather_predictions)
+    
+    df_predictions = pd.DataFrame(predictions, columns=["predictions"])
+    
+    for i in range(len(model_mock.called_dfs)):
+
+        assert expected_data_frames[i] == model_mock.called_dfs[i].tolist()
+    
+    assert_frame_equal(expected_prediction, df_predictions)
