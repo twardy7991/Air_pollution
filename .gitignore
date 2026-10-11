@@ -1,4 +1,5 @@
 airflow_project/logs
+airflow_project/config
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
