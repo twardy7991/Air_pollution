@@ -1,7 +1,7 @@
 pandas
 #pyarrow
 #pyspark == 3.5.8
-torch
+#torch
 sqlalchemy==2.0.48
 psycopg
 matplotlib

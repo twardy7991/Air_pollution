@@ -354,5 +354,7 @@ networks:
   default_pollution:
   db_pollution_network:
     external: true
+  airflow_apiserver_network:
+    external: true
   # spark-net:
   #   external: true 
